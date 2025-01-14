@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:latest
+    container_name: PostgresCont
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile_etl
+    depends_on:
+      - postgres_db
+    volumes:
+      - ./data:/app/data
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile_streamlit
+    ports:
+      - "8501:8501"
+    depends_on:
+      - postgres_db
+
+volumes:
+  postgres_data:
